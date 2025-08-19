@@ -1,18 +1,17 @@
 After downloading, set up in VSC using the terminal: 
 
 python -m venv venv
-.\venv\Scripts\activate 
+.\venv\Scripts\activate         or   .\venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 
 After making any change, do this on the terminal to upload on GitHub:
+(Run the code, so that it saves.)
 
-Run the code, so that it saves.
 pip freeze >> requirements.txt
-
 git status
 git add .
 git ls-files
-    if venv appears, remove it
+    if venv appears, remove it by:
     git rm -r --cached venv
     check git ls-files again
 git commit -m "<change msg>"
