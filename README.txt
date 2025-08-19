@@ -6,9 +6,11 @@ pip install -r requirements.txt
 
 After making any change, do this on the terminal to upload on GitHub:
 
-git init
+git status
 git add .
-git commit -m "Initial commit"
-git branch -M main
-git remote add origin https://github.com/YourUsername/your-repo.git
-git push -u origin main
+git ls-files
+    if venv appears, remove it
+    git rm -r --cached venv
+    check git ls-files again
+git commit -m "<change msg>"
+git push
