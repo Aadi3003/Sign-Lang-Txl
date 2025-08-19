@@ -4,6 +4,9 @@ python -m venv venv
 .\venv\Scripts\activate         or   .\venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 
+Select the proper python interpreter by ctrl+shift+P and select 3.11.7 (venv)
+If any other errors pop up, deal with them on the spot - you have all the files, just not the setup.
+
 After making any change, do this on the terminal to upload on GitHub:
 (Run the code, so that it saves.)
 
