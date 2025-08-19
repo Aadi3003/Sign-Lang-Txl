@@ -7,6 +7,9 @@ print ("Hello World!") # This is just to test that the file is executing.
 
 # Before running, check if (venv) is there in terminal before line, if not:
 # .\venv\Scripts\Activate.ps1
+# Or, just run it first then can work on it.
+
+# test change
 
 import cv2
 import mediapipe as mp
