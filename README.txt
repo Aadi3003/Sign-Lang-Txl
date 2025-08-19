@@ -6,6 +6,9 @@ pip install -r requirements.txt
 
 After making any change, do this on the terminal to upload on GitHub:
 
+Run the code, so that it saves.
+pip freeze >> requirements.txt
+
 git status
 git add .
 git ls-files
@@ -17,3 +20,5 @@ git push origin main
     if error appears, and it tells you to pull:
     git pull origin main --rebase    
     then do the push again
+
+Check if every file on GitHub is matching with your local file.
