@@ -13,4 +13,7 @@ git ls-files
     git rm -r --cached venv
     check git ls-files again
 git commit -m "<change msg>"
-git push
+git push origin main
+    if error appears, and it tells you to pull:
+    git pull origin main --rebase    
+    then do the push again
