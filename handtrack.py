@@ -5,6 +5,9 @@ print ("Hello World!") # This is just to test that the file is executing.
 
 # press Q to exit the window after running it.
 
+# Before running, check if (venv) is there in terminal before line, if not:
+# .\venv\Scripts\Activate.ps1
+
 import cv2
 import mediapipe as mp
 import numpy as np
