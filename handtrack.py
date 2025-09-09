@@ -16,52 +16,40 @@ import mediapipe as mp
 import numpy as np
 import csv
 import os
-
-# prediction
 import pandas as pd
-
-# Load saved dataset
-df = pd.read_csv("hand_dataset.csv")
-
-print("Dataset loaded:", df.shape)
-print(df.head())
-
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 
-# Split features (X) and labels (y)
-X = df.drop("label", axis=1).values
-y = df["label"].values
+# === Load dataset & train classifier ===
+DATASET_FILE = "hand_dataset.csv"
 
-# Train/test split
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+if os.path.exists(DATASET_FILE):
+    df = pd.read_csv(DATASET_FILE)
+    if len(df) > 0:  # only train if there are rows of data
+        print("Dataset loaded:", df.shape)
+        print(df.head())
 
-# Simple KNN classifier
-clf = KNeighborsClassifier(n_neighbors=3)
-clf.fit(X_train, y_train)
+        X = df.drop("label", axis=1).values
+        y = df["label"].values
 
-print("Classifier trained, accuracy on test:", clf.score(X_test, y_test))
-from sklearn.model_selection import train_test_split
-from sklearn.neighbors import KNeighborsClassifier
+        X_train, X_test, y_train, y_test = train_test_split(
+            X, y, test_size=0.2, random_state=42
+        )
 
-# Split features (X) and labels (y)
-X = df.drop("label", axis=1).values
-y = df["label"].values
+        clf = KNeighborsClassifier(n_neighbors=3)
+        clf.fit(X_train, y_train)
 
-# Train/test split
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-# Simple KNN classifier
-clf = KNeighborsClassifier(n_neighbors=3)
-clf.fit(X_train, y_train)
-
-print("Classifier trained, accuracy on test:", clf.score(X_test, y_test))
+        print("Classifier trained, accuracy on test:", clf.score(X_test, y_test))
+    else:
+        print("Dataset file exists but is empty. Add some samples first.")
+        clf = None
+else:
+    print("No dataset found yet, starting fresh.")
+    clf = None
 
 # === Setup ===
 mp_hands = mp.solutions.hands
 mp_drawing = mp.solutions.drawing_utils
-
-DATASET_FILE = "hand_dataset.csv"
 
 # Create CSV file with header if not exists
 if not os.path.exists(DATASET_FILE):
@@ -100,8 +88,8 @@ def features_from_result(result):
             right_feat = feat
     return np.concatenate([left_feat, right_feat])
 
-def draw_info(frame, feature_vec):
-    text = f"Features len={len(feature_vec)} | Press 0-9 to save, q to quit"
+def draw_info(frame):
+    text = f"Press 0-9 to save, q to quit"
     cv2.putText(frame, text, (10, 30), cv2.FONT_HERSHEY_SIMPLEX,
                 0.6, (255,255,255), 2, cv2.LINE_AA)
     return frame
@@ -131,13 +119,13 @@ with mp_hands.Hands(
                     frame, hand_landmarks, mp_hands.HAND_CONNECTIONS)
 
         feat_vec = features_from_result(result)
-        frame = draw_info(frame, feat_vec)
+        frame = draw_info(frame)
 
-        # Only predict if we have a non-zero feature vector
-        if np.any(feat_vec):
+        # Only predict if classifier is trained and we have a non-empty vector
+        if clf is not None and np.any(feat_vec):
             pred = clf.predict([feat_vec])[0]
             cv2.putText(frame, f"Predicted: {pred}", (10, 70),
-                cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 255, 255), 3, cv2.LINE_AA)
+                cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 0, 255), 3, cv2.LINE_AA)
 
         cv2.imshow("Hand Tracking + Data Capture", frame)
 
@@ -146,11 +134,14 @@ with mp_hands.Hands(
             break
         elif ord('0') <= key <= ord('9'):  # numbers 0-9
             label = chr(key)
-            with open(DATASET_FILE, mode="a", newline="") as f:
-                writer = csv.writer(f)
-                row = [label] + feat_vec.tolist()
-                writer.writerow(row)
-            print(f"[SAVED] Gesture {label}")
+            if np.any(feat_vec):  # ✅ skip empty vectors
+                with open(DATASET_FILE, mode="a", newline="") as f:
+                    writer = csv.writer(f)
+                    row = [label] + feat_vec.tolist()
+                    writer.writerow(row)
+                print(f"[SAVED] Gesture {label}")
+            else:
+                print("[SKIPPED] Empty vector, not saving.")
 
 cap.release()
 cv2.destroyAllWindows()
