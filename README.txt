@@ -1,3 +1,5 @@
+WIP
+For team member:
 After downloading, set up in VSC using the terminal: 
 
 python -m venv venv
